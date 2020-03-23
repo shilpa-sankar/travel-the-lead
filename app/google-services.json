@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "440392717935",
+    "firebase_url": "https://navigate-the-lead.firebaseio.com",
+    "project_id": "navigate-the-lead",
+    "storage_bucket": "navigate-the-lead.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440392717935:android:2eac71e811ae52ceda9f9a",
+        "android_client_info": {
+          "package_name": "com.example.travel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "440392717935-tkgre8pogg9iq0gb8kiokp2ggtq5upqh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.travel",
+            "certificate_hash": "b4fef6e4afc38d182d8cd109b5d6ca2724550e26"
+          }
+        },
+        {
+          "client_id": "440392717935-gag7q4rv6glpg3cscngifmqfccln2q2s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFYRec6sYqFb6JebNXnCk64KyZMpSImnM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "440392717935-gag7q4rv6glpg3cscngifmqfccln2q2s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
