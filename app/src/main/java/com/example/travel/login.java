@@ -19,76 +19,70 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class login extends AppCompatActivity {
 
-     private EditText emailid;
-     private EditText password;
-    private Button btn1;
+    private EditText emailET, passwordET;
     private TextView signup;
-    private TextView userregister;
-     private FirebaseAuth firebaseAuth;
-
+    private Button btn;
+    private String email, password;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-       emailid=(EditText)findViewById(R.id.ete1);
-        password=( EditText)findViewById(R.id.ete2);
-        btn1=(Button)findViewById(R.id.btn1);
-        signup=(TextView)findViewById(R.id.tev2);
-        userregister=(TextView)findViewById(R.id.tev1);
+        emailET = (EditText)findViewById(R.id.login_email);
+        passwordET = (EditText)findViewById(R.id.login_password);
+        btn = (Button)findViewById(R.id.btn1);
+        signup = (TextView)findViewById(R.id.signup_link);
 
-        firebaseAuth=FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = firebaseAuth.getCurrentUser();
 
-        FirebaseUser user=firebaseAuth.getCurrentUser();
-
-        if (user !=null){
+        if (user != null){
             finish();
-            startActivity(new Intent(login.this,user.class));
+            startActivity(new Intent(login.this, user.class));
         }
 
-
-        btn1.setOnClickListener(new View.OnClickListener() {
+        btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                validate(emailid.getText().toString(),password.getText().toString());
+                email = emailET.getText().toString().trim();
+                password = passwordET.getText().toString().trim();
+                if(!email.isEmpty() && !password.isEmpty()) {
+                    firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                startActivity(new Intent(login.this, user.class));
+                            } else {
+                                Toast.makeText(login.this, "login failed", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });
+                } else {
+                    Toast.makeText(login.this, "fill all details", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-       signup.setOnClickListener(new View.OnClickListener() {
+        signup.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
                startActivity(new Intent(login.this,MainActivity.class));
-           }
-       });
-
+            }
+        });
 
     }
-    private void validate (String ete1,String ete2){
-        if(!ete1.isEmpty() && !ete2.isEmpty()) {
-            firebaseAuth.signInWithEmailAndPassword(ete1, ete2).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(login.this, "login successful", Toast.LENGTH_SHORT).show();
-                        checkEmailVerification();
-                        startActivity(new Intent(login.this, user.class));
-                    } else {
-                        Toast.makeText(login.this, "login failed", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        } else {
-            Toast.makeText(this,"enter all the details",Toast.LENGTH_SHORT).show();
-        }
-    }
+
     private void checkEmailVerification() {
+
         FirebaseUser firebaseUser = firebaseAuth.getInstance().getCurrentUser();
         boolean emailflag = firebaseUser.isEmailVerified();
 
         startActivity(new Intent(login.this, user.class));
 
-
     }
+
 }
 

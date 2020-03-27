@@ -50,29 +50,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
         fetchLastLocation();
 
-
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
         //  .findFragmentById(R.id.map);
         // mapFragment.getMapAsync(this);
     }
+
     private  void savetemplocation(){
-
         if (templocation!=null){
-            DocumentReference LocationRef=firebaseFirestore.collection("userdata").document(String.valueOf(firebaseFirestore.getInstance()));
             super.onStart();
-            addSnapshotListener = LocationRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-                @Override
-                public void onEvent(@Nullable DocumentSnapshot documentSnapshot, @Nullable FirebaseFirestoreException e) {
-
-                    if (currentLocation != templocation) {
-                        templocation = currentLocation;
-                        savetemplocation();
-                    }
-                }
-
-            });
-
         }
     }
 
@@ -81,8 +67,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE);
             return;
         }
-
-
         Task<Location> task = fusedLocationProviderClient.getLastLocation();
         task.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
@@ -96,7 +80,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
-        return ;
     }
 
 

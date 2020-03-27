@@ -5,55 +5,71 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/astron"
+    android:visibility="visible"
     tools:context=".create">
 
+    <Button
+        android:id="@+id/btncreate"
+        android:layout_width="120dp"
+        android:layout_height="42dp"
+        android:background="@drawable/buttonborder"
+        android:backgroundTint="#5DA898"
+        android:text="CREATE"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.66" />
+
     <EditText
-        android:id="@+id/etcr1"
-        android:layout_width="217dp"
+        android:id="@+id/groupid"
+        android:layout_width="235dp"
         android:layout_height="50dp"
         android:ems="10"
-        android:hint="username"
+        android:hint="groupid"
         android:inputType="textPersonName"
         android:textColorHint="#9ACCBCBC"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.349" />
+        app:layout_constraintVertical_bias="0.387" />
 
     <EditText
-        android:id="@+id/etcr2"
-        android:layout_width="217dp"
+        android:id="@+id/password"
+        android:layout_width="235dp"
         android:layout_height="50dp"
         android:ems="10"
         android:hint="password"
-        android:inputType="numberPassword"
+        android:inputType="textPassword"
         android:textColorHint="#6FFFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.462" />
+        app:layout_constraintVertical_bias="0.500" />
 
-    <Button
-        android:id="@+id/btncreate"
-        android:layout_width="96dp"
-        android:layout_height="42dp"
-        android:background="@drawable/buttonboarder"
-        android:backgroundTint="#5DA898"
-        android:text="CREATE"
+    <EditText
+        android:id="@+id/groupname"
+        android:layout_width="235dp"
+        android:layout_height="50dp"
+        android:ems="10"
+        android:hint="group name"
+        android:inputType="textPersonName"
+        android:textColorHint="#57FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.66" />
+        app:layout_constraintVertical_bias="0.270" />
 
     <TextView
         android:id="@+id/tvcr1"
-        android:layout_width="226dp"
-        android:layout_height="38dp"
+        android:layout_width="235dp"
+        android:layout_height="45dp"
         android:shadowColor="#4CAF50"
         android:text="CREATE"
         android:textAlignment="center"
@@ -62,24 +78,9 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.518"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.128" />
-
-    <EditText
-        android:id="@+id/etcr3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="group name"
-        android:inputType="textPersonName"
-        android:textColorHint="#57FFFFFF"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.484"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.241" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

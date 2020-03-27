@@ -11,63 +11,90 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class join extends AppCompatActivity {
 
-    private TextView joinac;
-    private EditText name;
-    private EditText pass;
-    private Button joingroup;
-    private FirebaseFirestore firebaseFirestore;
-
+    private EditText groupid;
+    private EditText password;
+    private Button btjoin;
+    private FirebaseUser currentUser;
+    private FirebaseFirestore firestore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_join);
 
-        joinac=(TextView)findViewById(R.id.textv1);
-        name=(EditText)findViewById(R.id.edit1);
-        pass=(EditText)findViewById(R.id.edit2);
-        joingroup=(Button)findViewById(R.id.button1);
+        groupid = (EditText)findViewById(R.id.login_group_id);
+        password = (EditText)findViewById(R.id.login_group_password);
+        btjoin = (Button)findViewById(R.id.btnjoin);
 
-        firebaseFirestore=FirebaseFirestore.getInstance();
+        currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        firestore = FirebaseFirestore.getInstance();
 
-        joingroup.setOnClickListener(new View.OnClickListener() {
+        btjoin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String textv1=joinac.getText().toString().trim();
-                final String edit1=name.getText().toString().trim();
-                final String edit2=pass.getText().toString().trim();
 
-                Map<String,String> Userdata=new HashMap<>( );
-                Userdata.put("name",edit1);
-                Userdata.put("password",edit2);
+                final String docid = groupid.getText().toString().trim();
+                final String pass = password.getText().toString().trim();
 
-
-                firebaseFirestore.collection("Userdata").add(Userdata).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                final DocumentReference docRef = firestore.collection("groups").document(docid);
+                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Toast.makeText(join.this,"joined group",Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(join.this,MapsActivity.class));
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if(task.isSuccessful()) {
+                            DocumentSnapshot doc = task.getResult();
+                            if(doc.exists()) {
+                                if(pass.equals(doc.get("password").toString())) {
 
-                          }
-                    }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        String error=e.getMessage();
+                                    WriteBatch batch = firestore.batch();
+                                    String uid = currentUser.getUid();
+                                    DocumentReference userDoc = firestore.collection("users").document(uid);
+                                    batch.update(userDoc, "group", docid);
 
-                        Toast.makeText(join.this,"failed to join"+error,Toast.LENGTH_SHORT).show();
+                                    DocumentReference groupDoc = firestore.collection("groups").document(docid);
+                                    Map<String, Object> usersMap = new HashMap<>();
+                                    Map<String, Object> newUser = new HashMap<>();
+                                    newUser.put(uid, "null");
+                                    usersMap.put("users", newUser);
+                                    batch.set(groupDoc, usersMap, SetOptions.merge());
+                                    batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()) {
+                                                startActivity(new Intent(join.this, MapsActivity.class));
+                                            }
+                                        }
+                                    });
+
+                                } else {
+                                    Toast.makeText(join.this, "typed: "+pass, Toast.LENGTH_SHORT).show();
+                                }
+
+                            } else {
+                                Toast.makeText(join.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                            }
+                        }
                     }
                 });
-           }
+
+            }
         });
     }
 }

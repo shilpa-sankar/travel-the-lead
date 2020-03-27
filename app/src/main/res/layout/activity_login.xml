@@ -6,12 +6,28 @@
     android:layout_height="match_parent"
     tools:context=".login">
 
+    <TextView
+        android:id="@+id/login_title"
+        android:layout_width="238dp"
+        android:layout_height="45dp"
+        android:text="USER LOGIN"
+        android:textAlignment="center"
+        android:textColor="#009688"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.431"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.179" />
+
     <EditText
-        android:id="@+id/ete1"
+        android:id="@+id/login_email"
         android:layout_width="295dp"
-        android:layout_height="58dp"
+        android:layout_height="45dp"
         android:ems="10"
-        android:hint="email id"
+        android:hint="email"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,9 +37,9 @@
         app:layout_constraintVertical_bias="0.421" />
 
     <EditText
-        android:id="@+id/ete2"
+        android:id="@+id/login_password"
         android:layout_width="288dp"
-        android:layout_height="48dp"
+        android:layout_height="45dp"
         android:ems="10"
         android:hint="password"
         android:inputType="textPassword"
@@ -46,44 +62,30 @@
         app:layout_constraintVertical_bias="0.704" />
 
     <TextView
-        android:id="@+id/tv3"
-        android:layout_width="238dp"
-        android:layout_height="39dp"
-        android:text="USER LOGIN"
-        android:textAlignment="center"
-        android:textColor="#009688"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.431"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.179" />
-
-    <TextView
         android:id="@+id/tev1"
-        android:layout_width="121dp"
-        android:layout_height="21dp"
-        android:text="not registered?"
+        android:layout_width="80dp"
+        android:layout_height="25dp"
+        android:text="new user?"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.313"
+        app:layout_constraintHorizontal_bias="0.41"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.769" />
+        app:layout_constraintVertical_bias="0.8" />
 
     <TextView
-        android:id="@+id/tev2"
-        android:layout_width="71dp"
-        android:layout_height="26dp"
+        android:id="@+id/signup_link"
+        android:layout_width="55dp"
+        android:layout_height="25dp"
         android:text="signup"
         android:textSize="18sp"
+        android:textColor="#ff0000"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.691"
+        app:layout_constraintHorizontal_bias="0.615"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.774" />
+        app:layout_constraintVertical_bias="0.8" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
