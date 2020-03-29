@@ -78,7 +78,9 @@ public class join extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()) {
-                                                startActivity(new Intent(join.this, MapsActivity.class));
+                                                Intent intent = new Intent(join.this, MapsActivity.class);
+                                                intent.putExtra("groupid", docid);
+                                                startActivity(intent);
                                             }
                                         }
                                     });

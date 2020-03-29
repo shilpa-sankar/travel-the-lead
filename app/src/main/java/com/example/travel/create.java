@@ -76,6 +76,7 @@ public class create extends AppCompatActivity {
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if(task.isSuccessful()) {
                                                             Intent intent = new Intent(create.this, MapsActivity.class);
+                                                            intent.putExtra("groupid", docid);
                                                             startActivity(intent);
                                                         }
                                                     }
