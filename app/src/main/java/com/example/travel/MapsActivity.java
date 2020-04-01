@@ -1,7 +1,9 @@
 package com.example.travel;
 
 import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,16 +23,24 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.model.Document;
+import com.google.firebase.firestore.remote.Stream;
 import com.nabinbhandari.android.permissions.PermissionHandler;
 import com.nabinbhandari.android.permissions.Permissions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -39,6 +49,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private FusedLocationProviderClient client;
     private LocationRequest locationRequest;
+    private LocationCallback locationCallback;
 
     private FirebaseUser user;
     private FirebaseFirestore firestore;
@@ -60,10 +71,28 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         supportMapFragment.getMapAsync(this);
 
         client = new FusedLocationProviderClient(this);
+
         locationRequest = new LocationRequest();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationRequest.setInterval(4000);
         locationRequest.setFastestInterval(2000);
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+
+                super.onLocationResult(locationResult);
+                Location location = locationResult.getLastLocation();
+                if(location != null) {
+                    String locationString = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
+                    System.out.println("location data: " + locationString);
+                    groupdoc.update(
+                            "users." + user.getUid() + ".location" , locationString
+                    );
+                }
+
+            }
+        };
 
     }
 
@@ -72,6 +101,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         groupMap = googleMap;
         getPermissions();
+        streamLocations();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        new AlertDialog.Builder(this)
+                .setTitle("Exit group?")
+                .setMessage("This action will terminate you from the group")
+                .setCancelable(false)
+                .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        groupdoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                            @Override
+                            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                                Map<String, Object> docMap = documentSnapshot.getData();
+                                if(docMap.get("user") == null) {
+                                    groupdoc.delete();
+                                } else {
+                                    Map<String, Object> deleteMap = new HashMap<>();
+                                    deleteMap.put("users."+user.getUid(), FieldValue.delete());
+                                    groupdoc.update(deleteMap);
+                                }
+                            }
+                        });
+                        Map<String, Object> deleteMap = new HashMap<>();
+                        deleteMap.put("group", FieldValue.delete());
+                        firestore.collection("users").document(user.getUid()).update(deleteMap);
+                        client.removeLocationUpdates(locationCallback);
+                        finish();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                })
+                .create()
+                .show();
 
     }
 
@@ -102,25 +173,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PermissionChecker.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PermissionChecker.PERMISSION_GRANTED) {
-            client.requestLocationUpdates(locationRequest, new LocationCallback() {
-                @Override
-                public void onLocationResult(LocationResult locationResult) {
-
-                    super.onLocationResult(locationResult);
-                    Location location = locationResult.getLastLocation();
-                    if(location != null) {
-                        String locationString = String.valueOf(location.getLatitude()) + "," + String.valueOf(location.getLongitude());
-                        System.out.println("location data: " + locationString);
-                        groupdoc.update(
-                                "users." + user.getUid() , locationString
-                        );
-                    }
-
-                }
-            }, getMainLooper());
+            client.requestLocationUpdates(locationRequest, locationCallback, getMainLooper());
         } else {
             getPermissions();
         }
+    }
+
+    public void streamLocations() {
+        groupdoc.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
+
+                if(e != null) {
+                    System.out.println("error: " + e.toString());
+                    return;
+                }
+
+                if(documentSnapshot != null && documentSnapshot.exists()) {
+                    Map<String, Object> documentData = documentSnapshot.getData();
+                    Map<String, Map<String, String>> groupmembers = (Map<String, Map<String, String>>) documentData.get("users");
+                    for(Map.Entry<String, Map<String, String>> member : groupmembers.entrySet()) {
+                        System.out.print(member.getKey().toString() + " | " + member.getValue().get("name").toString() + " | " + member.getValue().get("location").toString());
+                    }
+                }
+
+            }
+        });
     }
 
 }

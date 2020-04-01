@@ -11,15 +11,19 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firestore.v1beta1.Value;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,8 +32,11 @@ public class Join extends AppCompatActivity {
     private EditText groupid;
     private EditText password;
     private Button btjoin;
+
     private FirebaseUser currentUser;
     private FirebaseFirestore firestore;
+
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +50,15 @@ public class Join extends AppCompatActivity {
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
+
+        firestore.collection("users").document(currentUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()) {
+                    username = documentSnapshot.getString("name");
+                }
+            }
+        });
 
         btjoin.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,9 +84,15 @@ public class Join extends AppCompatActivity {
                                     DocumentReference groupDoc = firestore.collection("groups").document(docid);
                                     Map<String, Object> usersMap = new HashMap<>();
                                     Map<String, Object> newUser = new HashMap<>();
-                                    newUser.put(uid, "null");
+
+                                    Map<String, String> userData = new HashMap<>();
+                                    userData.put("name", username);
+                                    userData.put("location", "null");
+
+                                    newUser.put(uid, userData);
                                     usersMap.put("users", newUser);
                                     batch.set(groupDoc, usersMap, SetOptions.merge());
+
                                     batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {

@@ -28,7 +28,9 @@ public class Create extends AppCompatActivity {
     private EditText password;
     private Button bcreate;
     private EditText groupname;
+
     private FirebaseFirestore firestore;
+    private String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,19 +46,28 @@ public class Create extends AppCompatActivity {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
 
+        firestore.collection("users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot.exists()) {
+                    username = documentSnapshot.getString("name");
+                }
+            }
+        });
+
         bcreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final String docid = groupid.getText().toString().trim();
 
-                Map<String, String> usersInGroup = new HashMap<>();
-                final String uid = user.getUid();
-                usersInGroup.put(uid, "null");
-                final Map<String, Object> GroupData = new HashMap<>();
-                GroupData.put("password", password.getText().toString().trim());
-                GroupData.put("groupname", groupname.getText().toString().trim());
-                GroupData.put("users", usersInGroup);
-
+                if(groupid.getText().length() == 0 || groupname.getText().length() == 0) {
+                    Toast.makeText(getApplicationContext(), "Fields cannot be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(password.getText().length() < 6) {
+                    Toast.makeText(getApplicationContext(), "Password should have atleast 6 characters", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 DocumentReference docRef = firestore.collection("groups").document(docid);
                 docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -67,6 +78,20 @@ public class Create extends AppCompatActivity {
                             if(doc.exists()) {
                                 Toast.makeText(Create.this, "groupID already in use!", Toast.LENGTH_SHORT).show();
                             } else {
+
+                                Map<String, String> userData = new HashMap<>();
+                                userData.put("name", username);
+                                userData.put("location", "null");
+                                Map<String, Object> usersInGroup = new HashMap<>();
+                                final String uid = user.getUid();
+                                usersInGroup.put(uid, userData);
+                                final Map<String, Object> GroupData = new HashMap<>();
+                                GroupData.put("users", usersInGroup);
+
+                                GroupData.put("password", password.getText().toString().trim());
+                                GroupData.put("groupname", groupname.getText().toString().trim());
+                                GroupData.put("strength", 1);
+
                                 firestore.collection("groups").document(docid).set(GroupData)
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
