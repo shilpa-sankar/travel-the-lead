@@ -17,7 +17,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-public class login extends AppCompatActivity {
+public class Login extends AppCompatActivity {
 
     private EditText emailET, passwordET;
     private TextView signup;
@@ -40,8 +40,8 @@ public class login extends AppCompatActivity {
         FirebaseUser user = firebaseAuth.getCurrentUser();
 
         if (user != null){
+            startActivity(new Intent(Login.this, User.class));
             finish();
-            startActivity(new Intent(login.this, user.class));
         }
 
         btn.setOnClickListener(new View.OnClickListener() {
@@ -54,14 +54,15 @@ public class login extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                startActivity(new Intent(login.this, user.class));
+                                startActivity(new Intent(Login.this, User.class));
+                                finish();
                             } else {
-                                Toast.makeText(login.this, "login failed", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Login.this, "login failed", Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
                 } else {
-                    Toast.makeText(login.this, "fill all details", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Login.this, "fill all details", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -69,18 +70,9 @@ public class login extends AppCompatActivity {
         signup.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               startActivity(new Intent(login.this,MainActivity.class));
+               startActivity(new Intent(Login.this,MainActivity.class));
             }
         });
-
-    }
-
-    private void checkEmailVerification() {
-
-        FirebaseUser firebaseUser = firebaseAuth.getInstance().getCurrentUser();
-        boolean emailflag = firebaseUser.isEmailVerified();
-
-        startActivity(new Intent(login.this, user.class));
 
     }
 

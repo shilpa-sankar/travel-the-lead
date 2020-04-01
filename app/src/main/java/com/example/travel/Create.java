@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -24,7 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
 
-public class create extends AppCompatActivity {
+public class Create extends AppCompatActivity {
     private EditText groupid;
     private EditText password;
     private Button bcreate;
@@ -33,6 +32,7 @@ public class create extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
@@ -41,7 +41,7 @@ public class create extends AppCompatActivity {
         groupname = (EditText)findViewById(R.id.groupname);
         bcreate = (Button)findViewById(R.id.btncreate);
 
-        final FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         firestore = FirebaseFirestore.getInstance();
 
         bcreate.setOnClickListener(new View.OnClickListener() {
@@ -50,7 +50,7 @@ public class create extends AppCompatActivity {
                 final String docid = groupid.getText().toString().trim();
 
                 Map<String, String> usersInGroup = new HashMap<>();
-                final String uid = firebaseAuth.getCurrentUser().getUid();
+                final String uid = user.getUid();
                 usersInGroup.put(uid, "null");
                 final Map<String, Object> GroupData = new HashMap<>();
                 GroupData.put("password", password.getText().toString().trim());
@@ -65,7 +65,7 @@ public class create extends AppCompatActivity {
                         if(task.isSuccessful()) {
                             DocumentSnapshot doc = task.getResult();
                             if(doc.exists()) {
-                                Toast.makeText(create.this, "groupID already in use!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Create.this, "groupID already in use!", Toast.LENGTH_SHORT).show();
                             } else {
                                 firestore.collection("groups").document(docid).set(GroupData)
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -75,9 +75,10 @@ public class create extends AppCompatActivity {
                                                     @Override
                                                     public void onComplete(@NonNull Task<Void> task) {
                                                         if(task.isSuccessful()) {
-                                                            Intent intent = new Intent(create.this, MapsActivity.class);
+                                                            Intent intent = new Intent(Create.this, MapsActivity.class);
                                                             intent.putExtra("groupid", docid);
                                                             startActivity(intent);
+                                                            finish();
                                                         }
                                                     }
                                                 });
@@ -86,7 +87,7 @@ public class create extends AppCompatActivity {
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(create.this, "failed to create group!", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(Create.this, "failed to create group!", Toast.LENGTH_SHORT).show();
                                             }
                                         });
                             }

@@ -30,6 +30,7 @@ dependencies {
     implementation 'com.karumi:dexter:5.0.0'
     implementation 'com.google.android.gms:play-services-maps:17.0.0'
     implementation 'com.google.android.gms:play-services-location:17.0.0'
+    implementation 'com.nabinbhandari.android:permissions:3.8'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
     apply plugin: 'com.google.gms.google-services'

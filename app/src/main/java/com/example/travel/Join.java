@@ -8,12 +8,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +23,7 @@ import com.google.firebase.firestore.WriteBatch;
 import java.util.HashMap;
 import java.util.Map;
 
-public class join extends AppCompatActivity {
+public class Join extends AppCompatActivity {
 
     private EditText groupid;
     private EditText password;
@@ -78,19 +75,20 @@ public class join extends AppCompatActivity {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()) {
-                                                Intent intent = new Intent(join.this, MapsActivity.class);
+                                                Intent intent = new Intent(Join.this, MapsActivity.class);
                                                 intent.putExtra("groupid", docid);
                                                 startActivity(intent);
+                                                finish();
                                             }
                                         }
                                     });
 
                                 } else {
-                                    Toast.makeText(join.this, "typed: "+pass, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(Join.this, "typed: "+pass, Toast.LENGTH_SHORT).show();
                                 }
 
                             } else {
-                                Toast.makeText(join.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Join.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
                             }
                         }
                     }

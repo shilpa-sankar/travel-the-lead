@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
@@ -38,6 +39,12 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
+        FirebaseUser user = firebaseAuth.getCurrentUser();
+        if(user != null) {
+            startActivity(new Intent(MainActivity.this, User.class));
+            finish();
+        }
+
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -51,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
                                 Map<String, String> userData = new HashMap<>();
                                 userData.put("name", name);
                                 db.collection("users").document(uid).set(userData);
-                                startActivity(new Intent(MainActivity.this, user.class));
+                                startActivity(new Intent(MainActivity.this, User.class));
+                                finish();
                             } else {
                                 Toast.makeText(MainActivity.this, "registration failed", Toast.LENGTH_SHORT).show();
                             }
@@ -69,7 +77,8 @@ public class MainActivity extends AppCompatActivity {
         loginlink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,login.class));
+                startActivity(new Intent(MainActivity.this, Login.class));
+                finish();
             }
         });
 
