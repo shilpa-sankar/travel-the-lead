@@ -115,24 +115,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+
+                        Map<String, Object> deleteGroupMap = new HashMap<>();
+                        deleteGroupMap.put("users."+user.getUid(), FieldValue.delete());
+                        groupdoc.update(deleteGroupMap);
+
                         groupdoc.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 Map<String, Object> docMap = documentSnapshot.getData();
-                                if(docMap.get("user") == null) {
+                                if(docMap.get("users") == null) {
                                     groupdoc.delete();
-                                } else {
-                                    Map<String, Object> deleteMap = new HashMap<>();
-                                    deleteMap.put("users."+user.getUid(), FieldValue.delete());
-                                    groupdoc.update(deleteMap);
                                 }
                             }
                         });
+
                         Map<String, Object> deleteMap = new HashMap<>();
                         deleteMap.put("group", FieldValue.delete());
                         firestore.collection("users").document(user.getUid()).update(deleteMap);
                         client.removeLocationUpdates(locationCallback);
                         finish();
+
                     }
                 })
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
