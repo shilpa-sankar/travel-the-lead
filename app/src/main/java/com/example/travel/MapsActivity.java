@@ -116,6 +116,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
+                        client.removeLocationUpdates(locationCallback);
+
                         Map<String, Object> deleteGroupMap = new HashMap<>();
                         deleteGroupMap.put("users."+user.getUid(), FieldValue.delete());
                         groupdoc.update(deleteGroupMap);
@@ -133,7 +135,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Map<String, Object> deleteMap = new HashMap<>();
                         deleteMap.put("group", FieldValue.delete());
                         firestore.collection("users").document(user.getUid()).update(deleteMap);
-                        client.removeLocationUpdates(locationCallback);
                         finish();
 
                     }
