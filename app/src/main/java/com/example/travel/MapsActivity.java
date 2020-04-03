@@ -23,7 +23,9 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -45,6 +47,8 @@ import java.util.Map;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap groupMap;
+    private Map<String, Marker> markers;
+
     private String groupid;
 
     private FusedLocationProviderClient client;
@@ -100,6 +104,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
 
         groupMap = googleMap;
+        markers = new HashMap<>();
         getPermissions();
         streamLocations();
 
@@ -196,8 +201,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 if(documentSnapshot != null && documentSnapshot.exists()) {
                     Map<String, Object> documentData = documentSnapshot.getData();
                     Map<String, Map<String, String>> groupmembers = (Map<String, Map<String, String>>) documentData.get("users");
+                    for(String id: markers.keySet()) {
+                        if(groupmembers.containsKey(id) == false) {
+                            Marker marker = markers.get(id);
+                            if(marker != null) {
+                                marker.remove();
+                                markers.remove(id);
+                            }
+                        }
+                    }
+                    System.out.println("\nFIRESTORE DATA");
                     for(Map.Entry<String, Map<String, String>> member : groupmembers.entrySet()) {
-                        System.out.print(member.getKey().toString() + " | " + member.getValue().get("name").toString() + " | " + member.getValue().get("location").toString());
+
+                        String member_id = member.getKey();
+                        String member_name = member.getValue().get("name");
+                        String member_location = member.getValue().get("location");
+
+                        if(member_location.equals("null") == false) {
+                            LatLng member_latlng = new LatLng(Double.valueOf(member_location.split(",")[0]), Double.valueOf(member_location.split(",")[1]));
+                            if(markers.containsKey(member_id)) {
+                                markers.get(member_id).setPosition(member_latlng);
+                            } else {
+                                Marker userMarker = groupMap.addMarker(new MarkerOptions()
+                                        .position(member_latlng)
+                                        .title(member_name)
+                                        .visible(true));
+                                markers.put(member_id, userMarker);
+                            }
+                        }
+
                     }
                 }
 
