@@ -35,13 +35,12 @@ public class Login extends AppCompatActivity {
 
         setLayoutData();
 
+        firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser != null){
             startActivity(new Intent(Login.this, User.class));
             finish();
         }
-
-        firebaseAuth = FirebaseAuth.getInstance();
 
         login_BTN.setOnClickListener(new View.OnClickListener() {
             @Override

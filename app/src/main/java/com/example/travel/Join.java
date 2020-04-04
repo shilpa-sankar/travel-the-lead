@@ -113,7 +113,6 @@ public class Join extends AppCompatActivity {
                                         Intent intent = new Intent(Join.this, MapsActivity.class);
                                         intent.putExtra("groupid", groupid);
                                         startActivity(intent);
-                                        finish();
                                     }
                                 })
                                 .addOnFailureListener(new OnFailureListener() {

@@ -109,7 +109,6 @@ public class Create extends AppCompatActivity {
                                                 Intent intent = new Intent(Create.this, MapsActivity.class);
                                                 intent.putExtra("groupid", docid);
                                                 startActivity(intent);
-                                                finish();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {

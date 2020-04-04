@@ -116,6 +116,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 }
                             }
                         });
+
                         finish();
                     }
 
@@ -183,7 +184,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     public void streamLocations() {
-        groupDoc.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+        groupDoc.addSnapshotListener(MapsActivity.this, new EventListener<DocumentSnapshot>() {
             @Override
             public void onEvent(@javax.annotation.Nullable DocumentSnapshot documentSnapshot, @javax.annotation.Nullable FirebaseFirestoreException e) {
 
