@@ -113,13 +113,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
 
                     private void deleteDataFromDocuments() {
-                        Map<String, Object> updateForUserDoc = new HashMap<>();
-                        updateForUserDoc.put("users."+ firebaseUser.getUid(), FieldValue.delete());
-                        groupDoc.update(updateForUserDoc);
-
-                        Map<String, Object> updateForGroupDoc = new HashMap<>();
-                        updateForGroupDoc.put("group", FieldValue.delete());
-                        firestore.collection("users").document(firebaseUser.getUid()).update(updateForGroupDoc);
+                        WriteBatch batch = firestore.batch();
+                        batch.update(groupDoc, "users."+firebaseUser.getUid(), FieldValue.delete());
+                        batch.update(firestore.collection("users").document(firebaseUser.getUid()), "group", FieldValue.delete());
+                        batch.commit().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                System.out.println("flushed user from group");
+                            }
+                        });
                     }
 
                 })
@@ -159,6 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+
     public void requestLocationUpdates() {
 
         groupDoc = firestore.collection("groups").document(groupid);
@@ -170,6 +173,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             getPermissions();
         }
     }
+
 
     public void streamLocations() {
         groupDoc.addSnapshotListener(new EventListener<DocumentSnapshot>() {
