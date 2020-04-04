@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,9 +21,9 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class Login extends AppCompatActivity {
 
-    private EditText emailET, passwordET;
-    private TextView signup;
-    private Button btn;
+    private EditText email_ET, password_ET;
+    private TextView signup_LNK;
+    private Button login_BTN;
     private String email, password;
     private FirebaseAuth firebaseAuth;
 
@@ -31,49 +33,60 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        emailET = (EditText)findViewById(R.id.login_email);
-        passwordET = (EditText)findViewById(R.id.login_password);
-        btn = (Button)findViewById(R.id.btn1);
-        signup = (TextView)findViewById(R.id.signup_link);
+        setLayoutData();
 
-        firebaseAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = firebaseAuth.getCurrentUser();
-
-        if (user != null){
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null){
             startActivity(new Intent(Login.this, User.class));
             finish();
         }
 
-        btn.setOnClickListener(new View.OnClickListener() {
+        firebaseAuth = FirebaseAuth.getInstance();
+
+        login_BTN.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                email = emailET.getText().toString().trim();
-                password = passwordET.getText().toString().trim();
-                if(!email.isEmpty() && !password.isEmpty()) {
-                    firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                startActivity(new Intent(Login.this, User.class));
-                                finish();
-                            } else {
-                                Toast.makeText(Login.this, "login failed", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
+            public void onClick(View view) {
+
+                email = email_ET.getText().toString().trim();
+                password = password_ET.getText().toString().trim();
+
+                if(email.isEmpty() || password.isEmpty()) {
+                    Toast.makeText(Login.this, "Fill all fields", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(Login.this, "fill all details", Toast.LENGTH_SHORT).show();
+                    firebaseAuth.signInWithEmailAndPassword(email, password)
+                            .addOnSuccessListener(new OnSuccessListener<AuthResult>() {
+                                @Override
+                                public void onSuccess(AuthResult authResult) {
+                                    startActivity(new Intent(Login.this, User.class));
+                                    finish();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(Login.this, "login failed", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                 }
+
             }
         });
 
-        signup.setOnClickListener(new View.OnClickListener() {
+        signup_LNK.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               startActivity(new Intent(Login.this,MainActivity.class));
+               startActivity(new Intent(Login.this, MainActivity.class));
+               finish();
             }
         });
 
+    }
+
+    private void setLayoutData() {
+        email_ET = (EditText)findViewById(R.id.login_email);
+        password_ET = (EditText)findViewById(R.id.login_password);
+        login_BTN = (Button)findViewById(R.id.btn1);
+        signup_LNK = (TextView)findViewById(R.id.signup_link);
     }
 
 }

@@ -19,15 +19,18 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
+import com.google.firestore.v1beta1.Write;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Create extends AppCompatActivity {
-    private EditText groupid;
-    private EditText password;
-    private Button bcreate;
-    private EditText groupname;
+
+    private EditText groupname_ET;
+    private EditText groupid_ET;
+    private EditText password_ET;
+    private Button create_BTN;
 
     private FirebaseFirestore firestore;
     private String username;
@@ -38,15 +41,17 @@ public class Create extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
 
-        groupid = (EditText)findViewById(R.id.groupid);
-        password = (EditText)findViewById(R.id.password);
-        groupname = (EditText)findViewById(R.id.groupname);
-        bcreate = (Button)findViewById(R.id.btncreate);
+        setLayoutData();
 
-        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser == null){
+            startActivity(new Intent(Create.this, Login.class));
+            finish();
+        }
+
         firestore = FirebaseFirestore.getInstance();
 
-        firestore.collection("users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        firestore.collection("users").document(firebaseUser.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 if(documentSnapshot.exists()) {
@@ -55,16 +60,16 @@ public class Create extends AppCompatActivity {
             }
         });
 
-        bcreate.setOnClickListener(new View.OnClickListener() {
+        create_BTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final String docid = groupid.getText().toString().trim();
+                final String docid = groupid_ET.getText().toString().trim();
 
-                if(groupid.getText().length() == 0 || groupname.getText().length() == 0) {
+                if(groupid_ET.getText().length() == 0 || groupname_ET.getText().length() == 0) {
                     Toast.makeText(getApplicationContext(), "Fields cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                if(password.getText().length() < 6) {
+                if(password_ET.getText().length() < 6) {
                     Toast.makeText(getApplicationContext(), "Password should have atleast 6 characters", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -82,31 +87,29 @@ public class Create extends AppCompatActivity {
                                 Map<String, String> userData = new HashMap<>();
                                 userData.put("name", username);
                                 userData.put("location", "null");
+
                                 Map<String, Object> usersInGroup = new HashMap<>();
-                                final String uid = user.getUid();
+                                final String uid = firebaseUser.getUid();
                                 usersInGroup.put(uid, userData);
+
                                 final Map<String, Object> GroupData = new HashMap<>();
                                 GroupData.put("users", usersInGroup);
 
-                                GroupData.put("password", password.getText().toString().trim());
-                                GroupData.put("groupname", groupname.getText().toString().trim());
+                                GroupData.put("password", password_ET.getText().toString().trim());
+                                GroupData.put("groupname", groupname_ET.getText().toString().trim());
                                 GroupData.put("strength", 1);
 
-                                firestore.collection("groups").document(docid).set(GroupData)
+                                WriteBatch batch = firestore.batch();
+                                batch.set(firestore.collection("groups").document(docid), GroupData);
+                                batch.update(firestore.collection("users").document(uid), "group", docid);
+                                batch.commit()
                                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                firestore.collection("users").document(uid).update("group", docid).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if(task.isSuccessful()) {
-                                                            Intent intent = new Intent(Create.this, MapsActivity.class);
-                                                            intent.putExtra("groupid", docid);
-                                                            startActivity(intent);
-                                                            finish();
-                                                        }
-                                                    }
-                                                });
+                                                Intent intent = new Intent(Create.this, MapsActivity.class);
+                                                intent.putExtra("groupid", docid);
+                                                startActivity(intent);
+                                                finish();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
@@ -115,11 +118,19 @@ public class Create extends AppCompatActivity {
                                                 Toast.makeText(Create.this, "failed to create group!", Toast.LENGTH_SHORT).show();
                                             }
                                         });
+
                             }
                         }
                     }
                 });
             }
         });
+    }
+
+    private void setLayoutData() {
+        groupid_ET = (EditText)findViewById(R.id.groupid);
+        password_ET = (EditText)findViewById(R.id.password);
+        groupname_ET = (EditText)findViewById(R.id.groupname);
+        create_BTN = (Button)findViewById(R.id.btncreate);
     }
 }

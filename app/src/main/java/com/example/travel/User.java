@@ -8,12 +8,11 @@ import android.view.View;
 import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class User extends AppCompatActivity {
 
-    private Button b1;
-    private Button logout;
-    private Button b2;
+    private Button create_BTN, join_BTN, logout_BTN;
     private FirebaseAuth firebaseAuth;
 
     @Override
@@ -22,12 +21,16 @@ public class User extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
-        firebaseAuth=FirebaseAuth.getInstance();
-        b1=(Button)findViewById(R.id.b1) ;
-        b2=(Button)findViewById(R.id.b2) ;
-        logout=(Button)findViewById(R.id.btnlog);
+        setLayoutData();
 
-        logout.setOnClickListener(new View.OnClickListener() {
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser == null){
+            startActivity(new Intent(User.this, Login.class));
+            finish();
+        }
+
+        logout_BTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 firebaseAuth.signOut();
@@ -36,20 +39,26 @@ public class User extends AppCompatActivity {
             }
         });
 
-        b1.setOnClickListener(new View.OnClickListener() {
+        create_BTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(User.this, Create.class ));
             }
         });
 
-        b2.setOnClickListener(new View.OnClickListener() {
+        join_BTN.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(User.this, Join.class));
             }
         });
 
+    }
+
+    private void setLayoutData() {
+        create_BTN = (Button)findViewById(R.id.b1) ;
+        join_BTN = (Button)findViewById(R.id.b2) ;
+        logout_BTN = (Button)findViewById(R.id.btnlog);
     }
 
 }

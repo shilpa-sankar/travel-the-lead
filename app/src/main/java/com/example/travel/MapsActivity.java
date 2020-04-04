@@ -4,8 +4,10 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -62,6 +64,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if(firebaseUser == null) {
+            startActivity(new Intent(MapsActivity.this, Login.class));
+            finish();
+        }
+
         firestore = FirebaseFirestore.getInstance();
 
         groupid = getIntent().getStringExtra("groupid");
@@ -197,6 +204,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 marker.remove();
                                 markers.remove(id);
                             }
+                            Toast.makeText(MapsActivity.this, "A user left", Toast.LENGTH_SHORT).show();
                         }
                     }
 
@@ -216,6 +224,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title(member_name)
                                         .visible(true));
                                 markers.put(member_id, userMarker);
+                                Toast.makeText(MapsActivity.this, "A user joined", Toast.LENGTH_SHORT).show();
                             }
                         }
 
