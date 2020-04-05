@@ -111,12 +111,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             @Override
                             public void onSuccess(DocumentSnapshot documentSnapshot) {
                                 Map<String, Object> docMap = documentSnapshot.getData();
+                                System.out.println(docMap.get("users").toString());
                                 if(docMap.get("users") == null) {
                                     groupDoc.delete();
                                 }
                             }
                         });
-
                         finish();
                     }
 
