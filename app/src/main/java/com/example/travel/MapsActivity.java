@@ -225,7 +225,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                         .title(member_name)
                                         .visible(true));
                                 markers.put(member_id, userMarker);
-                                Toast.makeText(MapsActivity.this, "A user joined", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(MapsActivity.this, member_name + " has joined", Toast.LENGTH_SHORT).show();
                             }
                         }
 
